@@ -15,18 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/stock-prices")
-@Tag(name = "Stock Prices V1 (Alpha Vantage)", description = "Endpoints for retrieving stock market data via Alpha Vantage")
-public class StockPriceController {
+@RequestMapping("/v2/stock-prices")
+@Tag(name = "Stock Prices V2 (Finnhub)", description = "Endpoints for retrieving stock market data via Finnhub")
+public class StockPriceControllerV2 {
 
     private final StockService stockService;
 
-    public StockPriceController(@Qualifier("alphaVantageStockService") StockService stockService) {
+    public StockPriceControllerV2(@Qualifier("finnhubStockService") StockService stockService) {
         this.stockService = stockService;
     }
 
     @GetMapping("/{symbol}")
-    @Operation(summary = "Get Stock Quotes", description = "Retrieves the latest price and trading day for one or more stock symbols (comma-separated).")
+    @Operation(summary = "Get Stock Quotes", description = "Retrieves the latest price and trading day for one or more stock symbols (comma-separated) using Finnhub.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved stock data")
     @ApiResponse(responseCode = "400", description = "Invalid symbol or API limit reached")
     @ApiResponse(responseCode = "500", description = "Internal server error")

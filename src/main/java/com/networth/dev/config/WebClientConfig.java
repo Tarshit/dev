@@ -8,8 +8,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    @Bean
-    public WebClient webClient(@Value("${alpha.vantage.base.url}") String baseUrl) {
+    @Bean("alphaVantageWebClient")
+    public WebClient alphaVantageWebClient(@Value("${alpha.vantage.base.url}") String baseUrl) {
+        return WebClient.builder().baseUrl(baseUrl).build();
+    }
+
+    @Bean("finnhubWebClient")
+    public WebClient finnhubWebClient(@Value("${finnhub.base.url}") String baseUrl) {
         return WebClient.builder().baseUrl(baseUrl).build();
     }
 }

@@ -7,5 +7,4 @@ public record StockResponse(
         String symbol,
         double price,
         String latestTradingDay
-){}
-
+) implements StockData {}
