@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.util.retry.Retry;
 
 @Service
 public class StockClientImpl implements StockClient {
@@ -28,6 +29,7 @@ public class StockClientImpl implements StockClient {
                         .build(symbol))
                 .retrieve()
                 .bodyToMono(AlphavantageResponse.class)
+                .retryWhen(Retry.backoff(3, java.time.Duration.ofSeconds(1)))
                 .block();
     }
 }
