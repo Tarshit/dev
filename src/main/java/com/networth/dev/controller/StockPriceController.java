@@ -1,6 +1,6 @@
 package com.networth.dev.controller;
 
-import com.networth.dev.dto.StockResponse;
+import com.networth.dev.model.PortfolioItem;
 import com.networth.dev.service.StockService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,7 +30,7 @@ public class StockPriceController {
     @ApiResponse(responseCode = "200", description = "Successfully retrieved stock data")
     @ApiResponse(responseCode = "400", description = "Invalid symbol or API limit reached")
     @ApiResponse(responseCode = "500", description = "Internal server error")
-    public List<StockResponse> getStock(@Parameter(description = "Comma-separated stock ticker symbols (e.g., AAPL,IBM)", required = true) @PathVariable String symbol){
+    public List<PortfolioItem> getStock(@Parameter(description = "Comma-separated stock ticker symbols (e.g., AAPL,IBM)", required = true) @PathVariable String symbol){
         return stockService.getStockForSymbol(symbol.toUpperCase());
     }
 }

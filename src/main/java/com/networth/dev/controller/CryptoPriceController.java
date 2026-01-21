@@ -1,6 +1,6 @@
 package com.networth.dev.controller;
 
-import com.networth.dev.dto.StockResponse;
+import com.networth.dev.model.PortfolioItem;
 import com.networth.dev.service.StockService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,7 +30,7 @@ public class CryptoPriceController {
     @ApiResponse(responseCode = "200", description = "Successfully retrieved crypto data")
     @ApiResponse(responseCode = "400", description = "Invalid ID or API limit reached")
     @ApiResponse(responseCode = "500", description = "Internal server error")
-    public List<StockResponse> getCryptoPrices(@Parameter(description = "Comma-separated cryptocurrency IDs (e.g., bitcoin,ethereum)", required = true) @PathVariable String ids){
+    public List<PortfolioItem> getCryptoPrices(@Parameter(description = "Comma-separated cryptocurrency IDs (e.g., bitcoin,ethereum)", required = true) @PathVariable String ids){
         return stockService.getStockForSymbol(ids);
     }
 }

@@ -1,8 +1,8 @@
 package com.networth.dev.service;
 
-import com.networth.dev.dto.StockResponse;
+import com.networth.dev.model.PortfolioItem;
 import java.util.List;
 
 public interface StockService {
-    List<StockResponse> getStockForSymbol(String stockSymbol);
+    List<PortfolioItem> getStockForSymbol(String stockSymbol);
 }
