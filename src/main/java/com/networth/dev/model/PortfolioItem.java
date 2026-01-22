@@ -1,5 +1,6 @@
 package com.networth.dev.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -13,14 +14,27 @@ public class PortfolioItem {
     private String name;
     @NonNull
     private String symbol;
-    private BigDecimal quantity;
-    private BigDecimal averageBuyPrice;
+    private BigDecimal quantity = BigDecimal.ZERO;
+
+    @JsonProperty("weightInOz")
+    private BigDecimal weightInOz = BigDecimal.ZERO;
+
+    private BigDecimal averageBuyPrice = BigDecimal.ZERO;
     private BigDecimal currentPrice;
     @NonNull
     private AssetType assetType;
     @NonNull
     private String currency;
     private LocalDateTime lastUpdated;
+
+    @JsonProperty("currentvalue")
+    private BigDecimal currentValue = BigDecimal.ZERO;
+
+    @JsonProperty("profitpercentage")
+    private BigDecimal profitPercentage = BigDecimal.ZERO;
+
+    public PortfolioItem() {
+    }
 
     public PortfolioItem(String name, String symbol, String currency, AssetType assetType, BigDecimal quantity, BigDecimal averageBuyPrice) {
         this.name = Objects.requireNonNull(name, "Name cannot be null");
@@ -32,10 +46,6 @@ public class PortfolioItem {
         this.lastUpdated = LocalDateTime.now();
     }
 
-    /**
-     * Factory method to create a PortfolioItem representing market data (quote).
-     * Quantity and AverageBuyPrice are set to zero.
-     */
     public static PortfolioItem fromMarketData(String name, String symbol, BigDecimal currentPrice, AssetType assetType) {
         PortfolioItem item = new PortfolioItem(name, symbol, "USD", assetType, BigDecimal.ZERO, BigDecimal.ZERO);
         item.setCurrentPrice(currentPrice);

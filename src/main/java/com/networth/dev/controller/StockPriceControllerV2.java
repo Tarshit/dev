@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v2/stock-prices")
-@Tag(name = "Stock Prices V2 (Finnhub)", description = "Endpoints for retrieving stock market data via Finnhub")
+@Tag(name = "Stock Prices Finnhub", description = "Endpoints for retrieving stock market data via Finnhub")
 public class StockPriceControllerV2 {
 
     private final StockService stockService;
