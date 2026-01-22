@@ -14,14 +14,17 @@ public class MarketDataFacade {
 
     private final StockService finnhubService;
     private final StockService coinGeckoService;
+    private final StockService goldService;
 
     public MarketDataFacade(@Qualifier("finnhubStockService") StockService finnhubService,
-                            @Qualifier("coinGeckoService") StockService coinGeckoService) {
+                            @Qualifier("coinGeckoService") StockService coinGeckoService,
+                            @Qualifier("goldService") StockService goldService) {
         this.finnhubService = finnhubService;
         this.coinGeckoService = coinGeckoService;
+        this.goldService = goldService;
     }
 
-    public List<PortfolioItem> getCombinedMarketData(String stockSymbols, String cryptoIds) {
+    public List<PortfolioItem> getCombinedMarketData(String stockSymbols, String cryptoIds, String metalSymbols) {
         CompletableFuture<List<PortfolioItem>> stocksFuture = CompletableFuture.supplyAsync(() -> {
             if (stockSymbols != null && !stockSymbols.isBlank()) {
                 return finnhubService.getStockForSymbol(stockSymbols);
@@ -36,10 +39,22 @@ public class MarketDataFacade {
             return Collections.emptyList();
         });
 
+        CompletableFuture<List<PortfolioItem>> metalsFuture = CompletableFuture.supplyAsync(() -> {
+            if (metalSymbols != null && !metalSymbols.isBlank()) {
+                return goldService.getStockForSymbol(metalSymbols);
+            }
+            return Collections.emptyList();
+        });
+
         List<PortfolioItem> result = new ArrayList<>();
         result.addAll(stocksFuture.join());
         result.addAll(cryptoFuture.join());
+        result.addAll(metalsFuture.join());
 
         return result;
+    }
+
+    public List<PortfolioItem> getCombinedMarketData(String stockSymbols, String cryptoIds) {
+        return getCombinedMarketData(stockSymbols, cryptoIds, null);
     }
 }

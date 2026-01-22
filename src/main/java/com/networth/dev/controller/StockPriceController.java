@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/stock-prices")
-@Tag(name = "Stock Prices V1 (Alpha Vantage)", description = "Endpoints for retrieving stock market data via Alpha Vantage")
+@Tag(name = "Stock Prices Alpha Vantage", description = "Endpoints for retrieving stock market data via Alpha Vantage")
 public class StockPriceController {
 
     private final StockService stockService;

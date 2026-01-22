@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v3/crypto-prices")
-@Tag(name = "Crypto Prices V3 (CoinGecko)", description = "Endpoints for retrieving cryptocurrency data via CoinGecko")
+@RequestMapping("/v1/crypto-prices")
+@Tag(name = "Crypto Prices CoinGecko", description = "Endpoints for retrieving cryptocurrency data via CoinGecko")
 public class CryptoPriceController {
 
     private final StockService stockService;
