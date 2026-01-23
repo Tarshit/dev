@@ -1,5 +1,6 @@
 package com.networth.dev.controller;
 
+import com.networth.dev.dto.PortfolioApiResponse;
 import com.networth.dev.model.PortfolioItem;
 import com.networth.dev.service.PortfolioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +22,7 @@ public class PortfolioController {
 
     @PostMapping("/calculate")
     @Operation(summary = "Calculate Portfolio Value", description = "Calculates current value and profit percentage for a list of stocks/cryptos. Aggregates duplicate symbols.")
-    public List<PortfolioItem> calculatePortfolio(@RequestBody List<PortfolioItem> portfolio) {
+    public PortfolioApiResponse calculatePortfolio(@RequestBody List<PortfolioItem> portfolio) {
         return portfolioService.calculatePortfolioValues(portfolio);
     }
 }

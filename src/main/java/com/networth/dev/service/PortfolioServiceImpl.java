@@ -1,5 +1,6 @@
 package com.networth.dev.service;
 
+import com.networth.dev.dto.PortfolioApiResponse;
 import com.networth.dev.model.AssetType;
 import com.networth.dev.model.PortfolioItem;
 import lombok.NonNull;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,9 +22,9 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
     @Override
-    public List<PortfolioItem> calculatePortfolioValues(List<PortfolioItem> items) {
+    public PortfolioApiResponse calculatePortfolioValues(List<PortfolioItem> items) {
         if (items == null || items.isEmpty()) {
-            return Collections.emptyList();
+            return createEmptyResponse();
         }
 
         List<PortfolioItem> uniqueItems = getPortfolioItems(items);
@@ -51,6 +53,8 @@ public class PortfolioServiceImpl implements PortfolioService {
                         (p1, p2) -> p1
                 ));
 
+        List<String> failedToFetch = new ArrayList<>();
+
         for (PortfolioItem item : uniqueItems) {
             BigDecimal currentPrice = priceMap.getOrDefault(item.getSymbol().toLowerCase(), BigDecimal.ZERO);
             item.setCurrentPrice(currentPrice);
@@ -60,14 +64,51 @@ public class PortfolioServiceImpl implements PortfolioService {
             BigDecimal quantityFactor = (item.getAssetType() == AssetType.METAL) ? item.getWeightInOz() : item.getQuantity();
             if (quantityFactor == null) quantityFactor = BigDecimal.ZERO;
             item.setCurrentValue(quantityFactor.multiply(currentPrice));
+            item.setTotalInvestment(quantityFactor.multiply(item.getAverageBuyPrice()));
 
             if (item.getAverageBuyPrice().compareTo(BigDecimal.ZERO) != 0) {
                 BigDecimal diff = currentPrice.subtract(item.getAverageBuyPrice());
                 item.setProfitPercentage(diff.divide(item.getAverageBuyPrice(), 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)));
             }
+
+            // Identify failed fetches: if price is zero, we assume fetch failed or no data
+            if (currentPrice.compareTo(BigDecimal.ZERO) == 0) {
+                failedToFetch.add(item.getSymbol());
+            }
         }
 
-        return uniqueItems;
+        return buildResponse(uniqueItems, failedToFetch);
+    }
+
+    private PortfolioApiResponse buildResponse(List<PortfolioItem> items, List<String> failedToFetch) {
+        List<PortfolioApiResponse.PortfolioItemResource> resources = items.stream()
+                .map(item -> PortfolioApiResponse.PortfolioItemResource.builder()
+                        .type("portfolio-item")
+                        .id(item.getSymbol())
+                        .attributes(item)
+                        .build())
+                .toList();
+
+        PortfolioApiResponse.ApiData data = PortfolioApiResponse.ApiData.builder()
+                .holdings(resources)
+                .failedToFetch(failedToFetch)
+                .build();
+
+        PortfolioApiResponse.Meta meta = PortfolioApiResponse.Meta.builder()
+                .totalHoldings(items.size())
+                .timestamp(DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now()))
+                .portfolioCurrency("USD")
+                .build();
+
+        return PortfolioApiResponse.builder()
+                .links(Map.of("self", "/v1/portfolio/calculate"))
+                .data(data)
+                .meta(meta)
+                .build();
+    }
+
+    private PortfolioApiResponse createEmptyResponse() {
+        return buildResponse(Collections.emptyList(), Collections.emptyList());
     }
 
     private static @NonNull List<PortfolioItem> getPortfolioItems(List<PortfolioItem> items) {

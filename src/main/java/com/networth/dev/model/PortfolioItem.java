@@ -33,6 +33,9 @@ public class PortfolioItem {
     @JsonProperty("profitpercentage")
     private BigDecimal profitPercentage = BigDecimal.ZERO;
 
+    @JsonProperty("totalInvestment")
+    private BigDecimal totalInvestment = BigDecimal.ZERO;
+
     public PortfolioItem() {
     }
 
