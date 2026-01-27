@@ -24,6 +24,7 @@ public class PortfolioItem {
     @NonNull
     private AssetType assetType;
     @NonNull
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String currency;
     private LocalDateTime lastUpdated;
 

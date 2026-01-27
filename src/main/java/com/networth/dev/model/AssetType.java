@@ -8,5 +8,6 @@ public enum AssetType {
     MUTUAL_FUND,
     BOND,
     REAL_ESTATE,
-    CASH
+    CASH,
+    COMMODITY
 }

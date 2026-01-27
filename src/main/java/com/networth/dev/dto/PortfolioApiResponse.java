@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -25,10 +26,16 @@ public class PortfolioApiResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ApiData {
+        private BigDecimal totalInvestment;
+        private BigDecimal currentTotalValue;
+        private BigDecimal totalProfitPercentage;
+        private int totalNumberOfHoldings;
+        private String currency;
         private List<PortfolioItemResource> holdings;
         
         @JsonProperty("failedtofetch")
         private List<String> failedToFetch;
+
     }
 
     @Data
@@ -47,8 +54,7 @@ public class PortfolioApiResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Meta {
-        private int totalHoldings;
         private String timestamp;
-        private String portfolioCurrency;
+
     }
 }

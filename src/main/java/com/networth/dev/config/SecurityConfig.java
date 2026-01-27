@@ -33,12 +33,12 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v1/portfolio/**",
                                 "/v1/metal-prices/**",
                                 "/v1/market-data/**",
                                 "/v1/stock-prices/**",
                                 "/v2/stock-prices/**",
-                                "/v3/crypto-prices/**"
+                                "/v3/crypto-prices/**",
+                                "/error"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
