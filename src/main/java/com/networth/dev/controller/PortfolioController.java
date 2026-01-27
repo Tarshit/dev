@@ -1,28 +1,39 @@
 package com.networth.dev.controller;
 
 import com.networth.dev.dto.PortfolioApiResponse;
-import com.networth.dev.model.PortfolioItem;
+import com.networth.dev.entity.Portfolio;
+import com.networth.dev.repository.PortfolioRepository;
 import com.networth.dev.service.PortfolioService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1/portfolio")
-@Tag(name = "Portfolio Management", description = "Endpoints for portfolio calculations")
 public class PortfolioController {
 
+    private final PortfolioRepository portfolioRepository;
     private final PortfolioService portfolioService;
 
-    public PortfolioController(PortfolioService portfolioService) {
+    public PortfolioController(PortfolioRepository portfolioRepository, PortfolioService portfolioService) {
+        this.portfolioRepository = portfolioRepository;
         this.portfolioService = portfolioService;
     }
 
-    @PostMapping("/calculate")
-    @Operation(summary = "Calculate Portfolio Value", description = "Calculates current value and profit percentage for a list of stocks/cryptos. Aggregates duplicate symbols.")
-    public PortfolioApiResponse calculatePortfolio(@RequestBody List<PortfolioItem> portfolio) {
-        return portfolioService.calculatePortfolioValues(portfolio);
+    @GetMapping("/{customerId}")
+    public PortfolioApiResponse getNetWorth(@PathVariable String customerId) {
+        return portfolioService.getNetWorthByCustomerId(customerId);
+    }
+    
+    @PutMapping
+    public Portfolio updatePortfolio(@RequestBody Portfolio portfolio) {
+        return portfolioRepository.findByCustomerId(portfolio.getCustomerId())
+                .map(existingPortfolio -> {
+                    existingPortfolio.setTotalInvestedAmount(portfolio.getTotalInvestedAmount());
+                    existingPortfolio.setTotalAssetsCount(portfolio.getTotalAssetsCount());
+                    existingPortfolio.setHoldings(portfolio.getHoldings());
+                    existingPortfolio.setCurrency(portfolio.getCurrency());
+                    return portfolioRepository.save(existingPortfolio);
+                })
+                .orElseGet(() -> portfolioRepository.save(portfolio));
     }
 }
