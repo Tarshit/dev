@@ -34,7 +34,7 @@ public class PortfolioApiResponse {
         private List<PortfolioItemResource> holdings;
         
         @JsonProperty("failedtofetch")
-        private List<String> failedToFetch;
+        private List<FailedItem> failedToFetch;
 
     }
 
@@ -56,5 +56,14 @@ public class PortfolioApiResponse {
     public static class Meta {
         private String timestamp;
 
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FailedItem {
+        private String symbol;
+        private String name;
     }
 }
