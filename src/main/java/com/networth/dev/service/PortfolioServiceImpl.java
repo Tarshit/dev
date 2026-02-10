@@ -64,13 +64,23 @@ public class PortfolioServiceImpl implements PortfolioService {
                         (p1, p2) -> p1
                 ));
 
-        List<String> failedToFetch = new ArrayList<>();
+        List<PortfolioApiResponse.FailedItem> failedToFetch = new ArrayList<>();
+        List<PortfolioItem> validItems = new ArrayList<>();
 
         BigDecimal totalPortfolioValue = BigDecimal.ZERO;
         BigDecimal totalPortfolioInvestment = BigDecimal.ZERO;
 
         for (PortfolioItem item : uniqueItems) {
             BigDecimal currentPrice = priceMap.getOrDefault(item.getSymbol().toLowerCase(), BigDecimal.ZERO);
+            
+            if (currentPrice.compareTo(BigDecimal.ZERO) == 0) {
+                failedToFetch.add(PortfolioApiResponse.FailedItem.builder()
+                        .symbol(item.getSymbol())
+                        .name(item.getName())
+                        .build());
+                continue;
+            }
+            
             item.setCurrentPrice(currentPrice);
             item.setLastUpdated(LocalDateTime.now());
 
@@ -88,10 +98,7 @@ public class PortfolioServiceImpl implements PortfolioService {
                 item.setProfitPercentage(diff.divide(item.getAverageBuyPrice(), 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)));
             }
 
-            // Identify failed fetches: if price is zero, we assume fetch failed or no data
-            if (currentPrice.compareTo(BigDecimal.ZERO) == 0) {
-                failedToFetch.add(item.getSymbol());
-            }
+            validItems.add(item);
         }
 
         BigDecimal totalProfitPercentage = BigDecimal.ZERO;
@@ -101,10 +108,10 @@ public class PortfolioServiceImpl implements PortfolioService {
                     .multiply(BigDecimal.valueOf(100));
         }
 
-        return buildResponse(uniqueItems, failedToFetch, selfLink, totalPortfolioValue, totalPortfolioInvestment, totalProfitPercentage);
+        return buildResponse(validItems, failedToFetch, selfLink, totalPortfolioValue, totalPortfolioInvestment, totalProfitPercentage);
     }
 
-    private PortfolioApiResponse buildResponse(List<PortfolioItem> items, List<String> failedToFetch, String selfLink, BigDecimal totalValue, BigDecimal totalInvestment, BigDecimal totalProfitPercentage) {
+    private PortfolioApiResponse buildResponse(List<PortfolioItem> items, List<PortfolioApiResponse.FailedItem> failedToFetch, String selfLink, BigDecimal totalValue, BigDecimal totalInvestment, BigDecimal totalProfitPercentage) {
         List<PortfolioApiResponse.PortfolioItemResource> resources = items.stream()
                 .map(item -> PortfolioApiResponse.PortfolioItemResource.builder()
                         .type("portfolio-item")
